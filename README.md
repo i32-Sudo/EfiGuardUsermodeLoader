@@ -3,3 +3,6 @@ This is a UserMode BootLoader for EfiGuard and other EFI based bootkits. It uses
 
 # Contact
 Discord: `_ambitza`
+
+# EfiGuard
+https://github.com/Mattiwatti/EfiGuard
