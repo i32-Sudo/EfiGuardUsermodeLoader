@@ -52,7 +52,7 @@ void diskUtil::DeletePartition(const std::string& partitionName) {
 
 int diskUtil::CreatePartition(const std::string& partitionName) {
     int validDiskNum = 0;
-    for (int diskNumber = 0; diskNumber < 4; ++diskNumber) {
+    for (int diskNumber = 0; diskNumber < 4; ++diskNumber) { // 4 = Max Disks to Check
         diskUtil::ExecuteDiskpartScript(partitionName, diskNumber);
         if (diskUtil::PartitionExists("X")) {
             validDiskNum = diskNumber;
